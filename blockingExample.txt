@@ -1,0 +1,34 @@
+
+Blocking example
+
+
+/* Before */
+for (i = 0; i < N; i = i+1)
+for (j = 0; j < N; j = j+1)
+{r = 0;
+for (k = 0; k < N; k = k+1){
+r = r + y[i][k]*z[k][j];};
+x[i][j] = r;
+};
+„X Two Inner Loops:
+¡V Read all NxN elements of z[]
+¡V Read N elements of 1 row of y[] repeatedly
+¡V Write N elements of 1 row of x[]
+„X Capacity Misses a function of N & Cache Size:
+¡V worst case => 2N3 + N2.
+„X Idea: compute on BxB submatrix that fits in cache
+
+
+/* After */
+for (jj = 0; jj < N; jj = jj+B)
+for (kk = 0; kk < N; kk = kk+B)
+for (i = 0; i < N; i = i+1)
+for (j = jj; j < min(jj+B-1,N); j = j+1)
+{r = 0;
+for (k = kk; k < min(kk+B-1,N); k = k+1) {
+r = r + y[i][k]*z[k][j];};
+x[i][j] = x[i][j] + r;
+};
+„X Capacity Misses from 2N3 + N2 to 2N3/B +N2
+„X B called Blocking Factor
+„X Conflict Misses Are Not As Easy...
